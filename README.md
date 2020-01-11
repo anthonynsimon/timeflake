@@ -1,5 +1,7 @@
 # timeflake
-Timeflakes are 64-bit (unsigned), roughly-ordered, globally-unique, URL-safe IDs. Inspired by Twitter's Snowflake and Instagram's UUID.
+Timeflakes are 64-bit (unsigned), roughly-ordered, URL-safe UUIDs. Inspired by Twitter's Snowflake and Instagram's UUID.
+
+It supports both incremental counters per shard ID, and cryptographically strong pseudo-random numbers for the UUID generation.
 
 The IDs store the following in binary form (in this order):
 - Time since custom epoch in seconds (32 bits).
@@ -24,6 +26,8 @@ counter = 5541
 Some nice properties of having an auto-incrementing sequence as the most significant part of the resulting ID are:
 - Reduced performance impact when using clustered indices on relational databases (vs random UUIDs).
 - The IDs are (roughly) sortable, so you can tell if one ID was created a few seconds before or after another.
+
+The `.random()` method returns a new UUID using cryptographically strong pseudo-random numbers for the counter segment.
 
 When using the random counter, the probability of a collision per logical shard per second is 2^22 (about 1 in 4 million). If you do not specify the `shard_id`, a random one will be selected for you.
 
