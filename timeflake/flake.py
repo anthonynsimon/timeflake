@@ -13,11 +13,15 @@ DEFAULT_ALPHABET = list("23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwx
 
 class Timeflake:
     """
-    A 64-bit (unsigned), roughly-ordered, globally-unique ID.
+    Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs.
 
-    When using random counter, the probability of a collision per second per worker is 2^22 (about 1 in 4 million).
+    When using the random counter method, the probability of a collision per worker per second is 2^22 (about 1 in 4 million).
 
     When using the default epoch (2020-01-01), the IDs will run out at around 2088-01-19.
+
+    :param shard_id: an int between 0 and 1023 representing the assigned logical shard id.
+    :param encoded: whether to encode the resulting int into a base57 str.
+    :param epoch: the custom epoch.
     """
 
     def __init__(self, shard_id=None, encoded=True, epoch=DEFAULT_EPOCH):
@@ -43,6 +47,9 @@ class Timeflake:
         return self._epoch
 
     def next(self):
+        """
+        Returns a new UUID using the next counter increment for the assigned shard ID.
+        """
         timestamp = int(time.time() - self._epoch)
         if timestamp > self._last_tick:
             self._last_tick = timestamp
@@ -54,6 +61,9 @@ class Timeflake:
         return timeflake
 
     def random(self):
+        """
+        Returns a new UUID using cryptographically strong pseudo-random numbers for the counter segment.
+        """
         timestamp = int(time.time() - self._epoch)
         timeflake = (timestamp << 32) + (self._shard_id << 22) + secrets.randbits(22)
         if self._encoded:

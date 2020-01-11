@@ -7,7 +7,9 @@ from timeflake.utils import atoi
 
 
 def main():
-    DESCRIPTION = """Timeflakes are 64-bit (unsigned), roughly-ordered, globally-unique, URL-safe IDs."""
+    DESCRIPTION = (
+        """Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs."""
+    )
 
     parser = argparse.ArgumentParser(
         description=DESCRIPTION, formatter_class=RawTextHelpFormatter
