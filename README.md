@@ -54,3 +54,9 @@ timeflake.random()
 The default alphabet for base57 encoding is: `23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz`. It intentionally removes visually similar characters (like 1 and l) while keeping the resulting ID short with a max of 11 characters.
 
 When using the default epoch (2020-01-01), the IDs will run out at around 2088-01-19.
+
+# Supported versions
+I'll be adding tests for various python versions. But I only intend to support Python 3.7+ at this moment.
+
+# Dependencies
+No dependencies other than the standard library.
