@@ -32,14 +32,17 @@ class Timeflake:
         self, shard_id=None, encoding="base57", epoch=DEFAULT_EPOCH, timefunc=time.time
     ):
         if shard_id is not None:
-            assert isinstance(
-                shard_id, int
-            ), "shard_id must be an int (no decimal points)"
-            assert 0 <= shard_id <= 1023, "shard_id must be between 0 and 1023"
+            if not isinstance(shard_id, int):
+                raise ValueError("shard_id must be an int (no decimal points)")
+            if not (0 <= shard_id <= 1023):
+                raise ValueError("shard_id must be between 0 and 1023")
             self._shard_id = shard_id
         else:
             self._shard_id = secrets.randbits(10)
-        assert encoding in {"base57", "uint64"}
+
+        if encoding not in {"base57", "uint64"}:
+            raise ValueError("Encoding must be one of 'base57' or 'uint64'")
+
         self._epoch = epoch
         self._last_tick = 0
         self._sequence = -1
@@ -97,18 +100,10 @@ class Timeflake:
             return itoa(value, DEFAULT_ALPHABET)
         elif self._encoding == "uint64":
             return value
-        else:
-            raise NotImplementedError(
-                f"Encoding for type: '{self._encoding}' has not being implemented."
-            )
 
     def _decode(self, value):
         if self._encoding == "base57":
             return atoi(value, DEFAULT_ALPHABET)
         elif self._encoding == "uint64":
             return value
-        else:
-            raise NotImplementedError(
-                f"Encoding for type: '{self._encoding}' has not being implemented."
-            )
 
