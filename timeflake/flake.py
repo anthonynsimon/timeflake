@@ -1,4 +1,4 @@
-import collections
+import math
 import secrets
 import time
 from datetime import datetime
@@ -9,22 +9,28 @@ from timeflake.utils import atoi, itoa
 # 2020-01-01T00:00:00Z
 DEFAULT_EPOCH = int(datetime(year=2020, month=1, day=1).strftime("%s"))
 DEFAULT_ALPHABET = list("23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
+MAX_COUNTER_VALUE = int(math.pow(2, 22)) - 1
 
 
 class Timeflake:
     """
     Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs.
 
-    When using the random counter method, the probability of a collision per worker per second is 2^22 (about 1 in 4 million).
+    When using the random counter method, the probability of a collision per worker
+    per second is 2^22 (about 1 in 4 million).
 
     When using the default epoch (2020-01-01), the IDs will run out at around 2088-01-19.
 
     :param shard_id: an int between 0 and 1023 representing the assigned logical shard id.
     :param encoded: whether to encode the resulting int into a base57 str.
     :param epoch: the custom epoch.
+    :param timefunc: a time function which returns the current unix time in seconds as an
+    int (optionally with millis as decimal points).
     """
 
-    def __init__(self, shard_id=None, encoded=True, epoch=DEFAULT_EPOCH):
+    def __init__(
+        self, shard_id=None, encoded=True, epoch=DEFAULT_EPOCH, timefunc=time.time
+    ):
         if shard_id is not None:
             assert isinstance(
                 shard_id, int
@@ -37,6 +43,7 @@ class Timeflake:
         self._last_tick = 0
         self._counter = -1
         self._encoded = encoded
+        self._timefunc = timefunc
 
     @property
     def shard_id(self):
@@ -50,11 +57,11 @@ class Timeflake:
         """
         Returns a new UUID using the next counter increment for the assigned shard ID.
         """
-        timestamp = int(time.time() - self._epoch)
+        timestamp = int(self._timefunc() - self._epoch)
         if timestamp > self._last_tick:
             self._last_tick = timestamp
             self._counter = -1
-        self._counter += 1
+        self._counter = (self._counter + 1) % MAX_COUNTER_VALUE
         timeflake = (timestamp << 32) + (self._shard_id << 22) + self._counter
         if self._encoded:
             return itoa(timeflake, DEFAULT_ALPHABET)
@@ -64,7 +71,7 @@ class Timeflake:
         """
         Returns a new UUID using cryptographically strong pseudo-random numbers for the counter segment.
         """
-        timestamp = int(time.time() - self._epoch)
+        timestamp = int(self._timefunc() - self._epoch)
         timeflake = (timestamp << 32) + (self._shard_id << 22) + secrets.randbits(22)
         if self._encoded:
             return itoa(timeflake, DEFAULT_ALPHABET)
