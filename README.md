@@ -8,6 +8,8 @@ The IDs store the following in binary form (in this order):
 - Logical shard ID (10 bits).
 - Counter (22 bits).
 
+## Example
+
 ```python
 timeflake = Timeflake()
 timeflake.random()
@@ -22,6 +24,8 @@ timestamp = 1578784406
 shard_id = 123
 counter = 5541
 ```
+
+## Properties
 
 Some nice properties of having an auto-incrementing sequence as the most significant part of the resulting ID are:
 - Reduced performance impact when using clustered indices on relational databases (vs random UUIDs).
