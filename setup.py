@@ -30,7 +30,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests",)),
     include_package_data=True,
     entry_points={"console_scripts": ["timeflake=timeflake.__main__:main",]},
     tests_require=[],
