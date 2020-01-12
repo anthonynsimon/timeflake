@@ -1,5 +1,7 @@
+import math
 import time
-from timeflake import Timeflake
+
+from timeflake import Timeflake, EPOCH
 from timeflake.flake import MAX_SEQUENCE_NUMBER
 
 
@@ -109,3 +111,21 @@ def test_timestamp():
     assert shard_id1 == shard_id2
     assert sequence1 == sequence3
 
+
+def test_unsigned_uint64_to_python_int():
+    # 1 second before overflow the 32 bits of the timestamp
+    now = EPOCH + int(math.pow(2, 32)) - 1
+
+    expected_bin = 0b1111111111111111111111111111111111111111110000000000000000000000
+    timeflake = Timeflake(shard_id=1023, timefunc=lambda: now, encoding="uint64")
+    for i in range(10):
+        flake = timeflake.next()
+        timestamp, shard_id, sequence = timeflake.parse(flake)
+        flake_bin = bin(flake)
+        num_bytes = len(flake_bin[2:])
+        assert flake > 0
+        assert num_bytes == 64
+        assert bin(expected_bin + i) == flake_bin
+        assert timestamp == 5872804095
+        assert shard_id == 1023
+        assert sequence == i
