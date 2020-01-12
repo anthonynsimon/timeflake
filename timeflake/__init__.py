@@ -1,6 +1,6 @@
 from timeflake.flake import Timeflake
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 
 # Global instance
 _global_instance = Timeflake()
