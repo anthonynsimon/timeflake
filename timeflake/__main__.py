@@ -45,12 +45,12 @@ def main():
         else:
             value = instance.random()
         if args.verbose:
-            timestamp, shard_id, counter = instance.parse(value)
+            timestamp, shard_id, sequence_number = instance.parse(value)
             decoded = ""
             if instance._encoding == "uint64":
                 decoded = f" decoded={atoi(value, DEFAULT_ALPHABET)}"
             print(
-                f"id={value}{decoded} timestamp={timestamp} shard_id={shard_id} counter={counter}"
+                f"id={value}{decoded} timestamp={timestamp} shard_id={shard_id} sequence_number={sequence_number}"
             )
         else:
             print(value)

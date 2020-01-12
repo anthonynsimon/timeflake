@@ -9,14 +9,14 @@ from timeflake.utils import atoi, itoa
 # 2020-01-01T00:00:00Z
 DEFAULT_EPOCH = int(datetime(year=2020, month=1, day=1).strftime("%s"))
 DEFAULT_ALPHABET = list("23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
-MAX_COUNTER_VALUE = int(math.pow(2, 22)) - 1
+MAX_SEQUENCE_NUMBER = int(math.pow(2, 22)) - 1
 
 
 class Timeflake:
     """
     Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs.
 
-    When using the random counter method, the probability of a collision per worker
+    When using the random sequence number method, the probability of a collision per worker
     per second is 2^22 (about 1 in 4 million).
 
     When using the default epoch (2020-01-01), the IDs will run out at around 2088-01-19.
@@ -42,7 +42,7 @@ class Timeflake:
         assert encoding in {"base57", "uint64"}
         self._epoch = epoch
         self._last_tick = 0
-        self._counter = -1
+        self._sequence = -1
         self._encoding = encoding
         self._timefunc = timefunc
 
@@ -56,19 +56,19 @@ class Timeflake:
 
     def next(self):
         """
-        Returns a new UUID using the next counter increment for the assigned shard ID.
+        Returns a new UUID using the next sequence number increment for the assigned shard ID.
         """
         timestamp = int(self._timefunc() - self._epoch)
         if timestamp > self._last_tick:
             self._last_tick = timestamp
-            self._counter = -1
-        self._counter = (self._counter + 1) % MAX_COUNTER_VALUE
-        flake = (timestamp << 32) + (self._shard_id << 22) + self._counter
+            self._sequence = -1
+        self._sequence = (self._sequence + 1) % MAX_SEQUENCE_NUMBER
+        flake = (timestamp << 32) + (self._shard_id << 22) + self._sequence
         return self._encode(flake)
 
     def random(self):
         """
-        Returns a new UUID using cryptographically strong pseudo-random numbers for the counter segment.
+        Returns a new UUID using cryptographically strong pseudo-random numbers for the sequence number.
         """
         timestamp = int(self._timefunc() - self._epoch)
         flake = (timestamp << 32) + (self._shard_id << 22) + secrets.randbits(22)
@@ -76,13 +76,13 @@ class Timeflake:
 
     def parse(self, flake):
         """
-        Parses a flake and returns a tuple with the parts: (timestamp, shard_id, counter).
+        Parses a flake and returns a tuple with the parts: (timestamp, shard_id, sequence_number).
         """
         flake = self._decode(flake)
         timestamp = self._epoch + self._extract_bits(flake, 32, 32)
         shard_id = self._extract_bits(flake, 22, 10)
-        counter = self._extract_bits(flake, 0, 22)
-        return (timestamp, shard_id, counter)
+        sequence_number = self._extract_bits(flake, 0, 22)
+        return (timestamp, shard_id, sequence_number)
 
     @classmethod
     def _extract_bits(cls, data, shift, length):

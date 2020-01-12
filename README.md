@@ -1,12 +1,12 @@
 # timeflake
 Timeflakes are 64-bit (unsigned), roughly-ordered, URL-safe UUIDs. Inspired by Twitter's Snowflake and Instagram's UUID.
 
-It supports both incremental counters per shard ID, and cryptographically strong pseudo-random numbers for the UUID generation.
+It supports incremental sequence per shard ID, and cryptographically strong pseudo-random numbers.
 
 The IDs store the following in binary form (in this order):
 - Time since custom epoch in seconds (32 bits).
 - Logical shard ID (10 bits).
-- Counter (22 bits).
+- Sequence number (22 bits).
 
 ## Example
 
@@ -21,7 +21,7 @@ The resulting string `efqCcXufN` contains the following information:
 uint64 = 4085399177663909
 timestamp = 1578784406
 shard_id = 123
-counter = 5541
+sequence_number = 5541
 ```
 
 ## Properties
@@ -30,17 +30,17 @@ Some nice properties of having an auto-incrementing sequence as the most signifi
 - Reduced performance impact when using clustered indices on relational databases (vs random UUIDs).
 - The IDs are (roughly) sortable, so you can tell if one ID was created a few seconds before or after another.
 
-The `.random()` method returns a new UUID using cryptographically strong pseudo-random numbers for the counter segment.
+The `.random()` method returns a new UUID using cryptographically strong pseudo-random numbers for the sequence number.
 
-When using the random counter, the probability of a collision per logical shard per second is 2^22 (about 1 in 4 million). If you do not specify the `shard_id`, a random one will be selected for you.
+When using the random method, the probability of a collision per logical shard per second is `0.00000024` (about 1 in 4 million). If you do not specify the `shard_id`, a random one will be selected for you.
 
-You can also use the `.next()` method to use an auto-incrementing sequence for the counter segment (don't forget to set a shard_id per thread/process/instance):
+You can also use the `.next()` method to use an auto-incrementing number for the sequence number:
 
 ```python
 timeflake = Timeflake(shard_id=7)
 timeflake.next()
 >>> 'eicbZeGxe'
-# uint64=4090831824755682 timestamp=1578785671 shard_id=7 counter=7138
+# uint64=4090831824755682 timestamp=1578785671 shard_id=7 sequence_number=7138
 ```
 
 
