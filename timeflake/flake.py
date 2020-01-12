@@ -1,13 +1,12 @@
 import math
 import secrets
 import time
-from datetime import datetime
 
 from timeflake.utils import atoi, itoa
 
 # Default epoch for timestamp part
 # 2020-01-01T00:00:00Z
-DEFAULT_EPOCH = int(datetime(year=2020, month=1, day=1).strftime("%s"))
+DEFAULT_EPOCH = 1577836800
 DEFAULT_ALPHABET = list("23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 MAX_SEQUENCE_NUMBER = int(math.pow(2, 22)) - 1
 
@@ -106,4 +105,3 @@ class Timeflake:
             return atoi(value, DEFAULT_ALPHABET)
         elif self._encoding == "uint64":
             return value
-
