@@ -43,10 +43,10 @@ timeflake.next()
 
 By default they are encoded in base57 for (nice) URL-safe representation. This means they are concise (max length of 11 characters).
 
-If you prefer to work with the unsigned 64-bit integer form, simply pass `encoded=False` to the instance:
+If you prefer to work with the unsigned 64-bit integer form, simply pass `encoding='uint64'` to the instance:
 
 ```python
-timeflake = Timeflake(encoded=False)
+timeflake = Timeflake(encoding='uint64')
 timeflake.random()
 >>> 4085399177663909
 ```

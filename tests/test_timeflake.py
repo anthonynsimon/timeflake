@@ -67,9 +67,9 @@ def test_counter_restart():
         assert counter == i
 
 
-def test_non_encoded():
+def test_uint64():
     now = int(time.time())
-    timeflake = Timeflake(encoded=False, timefunc=lambda: now)
+    timeflake = Timeflake(encoding="uint64", timefunc=lambda: now)
     for i in range(1000):
         flake = timeflake.random()
         timestamp, shard_id, counter = timeflake.parse(flake)

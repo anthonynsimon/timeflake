@@ -47,7 +47,7 @@ def main():
         if args.verbose:
             timestamp, shard_id, counter = instance.parse(value)
             decoded = ""
-            if instance._encoded:
+            if instance._encoding == "uint64":
                 decoded = f" decoded={atoi(value, DEFAULT_ALPHABET)}"
             print(
                 f"id={value}{decoded} timestamp={timestamp} shard_id={shard_id} counter={counter}"

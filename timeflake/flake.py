@@ -22,14 +22,14 @@ class Timeflake:
     When using the default epoch (2020-01-01), the IDs will run out at around 2088-01-19.
 
     :param shard_id: an int between 0 and 1023 representing the assigned logical shard id.
-    :param encoded: whether to encode the resulting int into a base57 str.
+    :param encoding: valid values are 'uint64' and 'base57' (default).
     :param epoch: the custom epoch.
     :param timefunc: a time function which returns the current unix time in seconds as an
     int (optionally with millis as decimal points).
     """
 
     def __init__(
-        self, shard_id=None, encoded=True, epoch=DEFAULT_EPOCH, timefunc=time.time
+        self, shard_id=None, encoding="base57", epoch=DEFAULT_EPOCH, timefunc=time.time
     ):
         if shard_id is not None:
             assert isinstance(
@@ -39,10 +39,11 @@ class Timeflake:
             self._shard_id = shard_id
         else:
             self._shard_id = secrets.randbits(10)
+        assert encoding in {"base57", "uint64"}
         self._epoch = epoch
         self._last_tick = 0
         self._counter = -1
-        self._encoded = encoded
+        self._encoding = encoding
         self._timefunc = timefunc
 
     @property
@@ -62,30 +63,25 @@ class Timeflake:
             self._last_tick = timestamp
             self._counter = -1
         self._counter = (self._counter + 1) % MAX_COUNTER_VALUE
-        timeflake = (timestamp << 32) + (self._shard_id << 22) + self._counter
-        if self._encoded:
-            return itoa(timeflake, DEFAULT_ALPHABET)
-        return timeflake
+        flake = (timestamp << 32) + (self._shard_id << 22) + self._counter
+        return self._encode(flake)
 
     def random(self):
         """
         Returns a new UUID using cryptographically strong pseudo-random numbers for the counter segment.
         """
         timestamp = int(self._timefunc() - self._epoch)
-        timeflake = (timestamp << 32) + (self._shard_id << 22) + secrets.randbits(22)
-        if self._encoded:
-            return itoa(timeflake, DEFAULT_ALPHABET)
-        return timeflake
+        flake = (timestamp << 32) + (self._shard_id << 22) + secrets.randbits(22)
+        return self._encode(flake)
 
-    def parse(self, timeflake):
+    def parse(self, flake):
         """
-        Parses a timeflake and returns a tuple with the parts: (timestamp, shard_id, counter).
+        Parses a flake and returns a tuple with the parts: (timestamp, shard_id, counter).
         """
-        if self._encoded:
-            timeflake = atoi(timeflake, DEFAULT_ALPHABET)
-        timestamp = self._epoch + self._extract_bits(timeflake, 32, 32)
-        shard_id = self._extract_bits(timeflake, 22, 10)
-        counter = self._extract_bits(timeflake, 0, 22)
+        flake = self._decode(flake)
+        timestamp = self._epoch + self._extract_bits(flake, 32, 32)
+        shard_id = self._extract_bits(flake, 22, 10)
+        counter = self._extract_bits(flake, 0, 22)
         return (timestamp, shard_id, counter)
 
     @classmethod
@@ -95,3 +91,24 @@ class Timeflake:
         """
         bitmask = ((1 << length) - 1) << shift
         return (data & bitmask) >> shift
+
+    def _encode(self, value):
+        if self._encoding == "base57":
+            return itoa(value, DEFAULT_ALPHABET)
+        elif self._encoding == "uint64":
+            return value
+        else:
+            raise NotImplementedError(
+                f"Encoding for type: '{self._encoding}' has not being implemented."
+            )
+
+    def _decode(self, value):
+        if self._encoding == "base57":
+            return atoi(value, DEFAULT_ALPHABET)
+        elif self._encoding == "uint64":
+            return value
+        else:
+            raise NotImplementedError(
+                f"Encoding for type: '{self._encoding}' has not being implemented."
+            )
+
