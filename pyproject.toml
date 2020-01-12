@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "timeflake"
+version = "0.1.1"
+description = "Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs."
+authors = ["Anthony Najjar Simon"]
+license = "MIT"
+readme = 'README.md'
+repository = "https://github.com/anthonynsimon/timeflake"
+homepage = "https://github.com/anthonynsimon/timeflake"
+keywords = ['timeflake', 'uuid', 'id']
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+black = "^19.10b0"
+pytest = "^5.3.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+
