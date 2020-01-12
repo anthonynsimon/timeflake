@@ -14,12 +14,11 @@ The IDs store the following in binary form (in this order):
 timeflake = Timeflake()
 timeflake.random()
 >>> 'eihdZ7Hqa'
-# decoded=4091004504637904 timestamp=1578785711 shard_id=217 counter=393680
 ```
 
 The resulting string `efqCcXufN` contains the following information:
 ```
-decoded = 4085399177663909
+uint64 = 4085399177663909
 timestamp = 1578784406
 shard_id = 123
 counter = 5541
@@ -41,7 +40,7 @@ You can also use the `.next()` method to use an auto-incrementing sequence for t
 timeflake = Timeflake(shard_id=7)
 timeflake.next()
 >>> 'eicbZeGxe'
-# decoded=4090831824755682 timestamp=1578785671 shard_id=7 counter=7138
+# uint64=4090831824755682 timestamp=1578785671 shard_id=7 counter=7138
 ```
 
 
