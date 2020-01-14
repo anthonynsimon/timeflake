@@ -5,7 +5,9 @@ def main():
     res = timeit.timeit("timeflake.random()", setup="import timeflake")
     print(f"timeflake.random: {res}")
 
-    res = timeit.timeit("timeflake.next()", setup="import timeflake")
+    res = timeit.timeit(
+        "flake.next()", setup="import timeflake; flake = timeflake.Timeflake()"
+    )
     print(f"timeflake.next: {res}")
 
     res = timeit.timeit("uuid.uuid4()", setup="import uuid")

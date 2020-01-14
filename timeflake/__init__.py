@@ -1,10 +1,7 @@
-__version__ = "0.1.3"
+from timeflake.flake import DEFAULT_ALPHABET, DEFAULT_EPOCH, Timeflake
 
-from timeflake.flake import Timeflake
+__all__ = ["Timeflake", "DEFAULT_ALPHABET", "DEFAULT_EPOCH", "random", "parse"]
 
-# Global instance
-_global_instance = Timeflake()
-EPOCH = _global_instance.epoch
-random = _global_instance.random
-next = _global_instance.next
-parse = _global_instance.parse
+_global_timeflake = Timeflake()
+random = _global_timeflake.random
+parse = _global_timeflake.parse
