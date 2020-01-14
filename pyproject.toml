@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "timeflake"
-version = "0.1.3"
+version = "0.2.0"
 description = "Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs."
 authors = ["Anthony Najjar Simon"]
 license = "MIT"

@@ -1,7 +1,7 @@
 import math
 import time
 
-from timeflake import Timeflake, EPOCH
+from timeflake import Timeflake, DEFAULT_EPOCH
 from timeflake.flake import MAX_SEQUENCE_NUMBER
 
 
@@ -114,7 +114,7 @@ def test_timestamp():
 
 def test_unsigned_uint64_to_python_int():
     # 1 second before overflow the 32 bits of the timestamp
-    now = EPOCH + int(math.pow(2, 32)) - 1
+    now = DEFAULT_EPOCH + int(math.pow(2, 32)) - 1
 
     expected_bin = 0b1111111111111111111111111111111111111111110000000000000000000000
     timeflake = Timeflake(shard_id=1023, timefunc=lambda: now, encoding="uint64")
