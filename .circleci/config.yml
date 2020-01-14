@@ -11,7 +11,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements-dev.txt" }}
+            - deps-{{ checksum "requirements-dev.txt" }}-v1
 
       - run:
           name: install dependencies
@@ -23,7 +23,13 @@ jobs:
       - save_cache:
           paths:
             - ./venv
-          key: v1-dependencies-{{ checksum "requirements-dev.txt" }}
+          key: deps-{{ checksum "requirements-dev.txt" }}-v1
+
+      - run:
+          name: check format
+          command: |
+            . venv/bin/activate
+            black --check
 
       - run:
           name: run tests
