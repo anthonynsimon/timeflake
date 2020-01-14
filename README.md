@@ -63,7 +63,7 @@ timeflake.random()
 
 The default alphabet for base62 encoding is: `0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz`.
 
-When using the default epoch (2020-01-01), the IDs will run out at around 2088-01-19.
+When using the default epoch (2020-01-01), the IDs will run out at around 2156-02-07T07:28:15Z, giving you 100+ years of IDs.
 
 ## Supported versions
 Right now the codebase is only tested with Python 3.7+.

@@ -27,7 +27,8 @@ class Timeflake:
     
     Please be aware that system clocks can go backwards, and leap seconds can change these probabilities.
     
-    When using the default epoch (2020-01-01), the IDs will run out at around 2088-01-19.
+    When using the default epoch (2020-01-01), the IDs will run out at around 2156-02-07T07:28:15Z,
+    giving you 100+ years of IDs.
     
     Params:
     :param shard_id: an int between 0 and 1023 representing the assigned logical shard id
