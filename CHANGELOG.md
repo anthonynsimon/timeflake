@@ -3,6 +3,11 @@
 ## Next
 - 
 
+## 0.2.0
+- When using the random method, it will now use the 32 bits available.
+- Use base62 encoding for more standard alphabet.
+- Speedup encoding and decoding by using lru_cache and alphabet index.
+
 ## 0.1.3
 - Use int form of default epoch to avoid timezone issues with datetime
 
