@@ -1,5 +1,5 @@
 import math
-import secrets
+import os
 import time
 
 from timeflake.utils import atoi, itoa
@@ -10,17 +10,30 @@ DEFAULT_EPOCH = 1577836800
 DEFAULT_ALPHABET = list("23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 MAX_SEQUENCE_NUMBER = int(math.pow(2, 22)) - 1
 
+TIMESTAMP_MASK = 0b1111111111111111111111111111111100000000000000000000000000000000
+RANDOM_MASK = 0b0000000000000000000000000000000011111111110000000000000000000000
+SEQUENCE_MASK = 0b0000000000000000000000000000000000000000001111111111111111111111
+
+# Cache property access
+random_bytes = os.urandom
+
 
 class Timeflake:
     """
     Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs.
-
-    When using the random sequence number method, the probability of a collision per worker
-    per second is 2^22 (about 1 in 4 million).
-
+    
+    When using the random method, you should expect a collision to occur if you're creating
+    IDs at a rate of 77,162 within a single second.
+    
+    Once that is not enough, you can transition to using the '.next()' method (shard + counter instead of random),
+    giving you 4,194,304 IDs per shard per second.
+    
+    Please be aware that system clocks can go backwards, and leap seconds can change these probabilities.
+    
     When using the default epoch (2020-01-01), the IDs will run out at around 2088-01-19.
-
-    :param shard_id: an int between 0 and 1023 representing the assigned logical shard id.
+    Params:
+    :param shard_id: an int between 0 and 1023 representing the assigned logical shard id
+    (or random if not provided).
     :param encoding: valid values are 'uint64' and 'base57' (default).
     :param epoch: the custom epoch.
     :param timefunc: a time function which returns the current unix time in seconds as an
@@ -37,7 +50,7 @@ class Timeflake:
                 raise ValueError("shard_id must be between 0 and 1023")
             self._shard_id = shard_id
         else:
-            self._shard_id = secrets.randbits(10)
+            self._shard_id = int.from_bytes(random_bytes(2), "big", signed=False) >> 6
 
         if encoding not in {"base57", "uint64"}:
             raise ValueError("Encoding must be one of 'base57' or 'uint64'")
@@ -64,8 +77,9 @@ class Timeflake:
         if timestamp > self._last_tick:
             self._last_tick = timestamp
             self._sequence = -1
-        self._sequence = (self._sequence + 1) % MAX_SEQUENCE_NUMBER
-        flake = (timestamp << 32) + (self._shard_id << 22) + self._sequence
+        seq = (self._sequence + 1) % MAX_SEQUENCE_NUMBER
+        flake = (timestamp << 32) + (self._shard_id << 22) + seq
+        self._sequence = seq
         return self._encode(flake)
 
     def random(self):
@@ -73,7 +87,8 @@ class Timeflake:
         Returns a new UUID using cryptographically strong pseudo-random numbers for the sequence number.
         """
         timestamp = int(self._timefunc() - self._epoch)
-        flake = (timestamp << 32) + (self._shard_id << 22) + secrets.randbits(22)
+        random = int.from_bytes(random_bytes(4), "big", signed=False)
+        flake = (timestamp << 32) | random
         return self._encode(flake)
 
     def parse(self, flake):
@@ -81,18 +96,10 @@ class Timeflake:
         Parses a flake and returns a tuple with the parts: (timestamp, shard_id, sequence_number).
         """
         flake = self._decode(flake)
-        timestamp = self._epoch + self._extract_bits(flake, 32, 32)
-        shard_id = self._extract_bits(flake, 22, 10)
-        sequence_number = self._extract_bits(flake, 0, 22)
+        timestamp = self._epoch + ((flake & TIMESTAMP_MASK) >> 32)
+        shard_id = (flake & SEQUENCE_MASK) >> 22
+        sequence_number = flake & SEQUENCE_MASK
         return (timestamp, shard_id, sequence_number)
-
-    @classmethod
-    def _extract_bits(cls, data, shift, length):
-        """
-        Extract a portion of a bit string in it's integer form.
-        """
-        bitmask = ((1 << length) - 1) << shift
-        return (data & bitmask) >> shift
 
     def _encode(self, value):
         if self._encoding == "base57":
