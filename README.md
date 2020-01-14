@@ -38,9 +38,9 @@ Some nice properties of having an auto-incrementing sequence as the most signifi
 - Reduced performance impact when using clustered indices on relational databases (vs UUID v1/v4).
 - The IDs are (roughly) sortable, so you can tell if one ID was created a few seconds before or after another.
 
-The `.random()` method returns a new UUID using cryptographically strong pseudo-random numbers for the shard ID and sequence number (32 bits of randomness).
+The `.random()` method returns a new UUID using cryptographically strong pseudo-random numbers for the shard ID and sequence number (32 bits of randomness). You should expect a collision to occur if you're creating IDs at a rate of 77,162 within a single second using this method.
 
-You can also use the `.next()` method to use an auto-incrementing number for the sequence number:
+Once that is not enough, you can transition to using the '.next()' method (shard + counter instead of random), giving you 4,194,304 IDs per shard per second:
 
 ```python
 from timeflake import Timeflake
