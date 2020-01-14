@@ -2,6 +2,11 @@ import timeit
 
 
 def main():
+    res = timeit.timeit(
+        "timeflake.parse(flake)", setup="import timeflake; flake = timeflake.random()"
+    )
+    print(f"timeflake.parse: {res}")
+
     res = timeit.timeit("timeflake.random()", setup="import timeflake")
     print(f"timeflake.random: {res}")
 
