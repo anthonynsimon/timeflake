@@ -3,10 +3,13 @@ Timeflakes are 64-bit (unsigned), roughly-ordered, URL-safe UUIDs. Inspired by T
 
 It supports incremental sequence per shard ID, and cryptographically strong pseudo-random numbers.
 
-The IDs store the following in binary form (in this order):
-- Time since custom epoch in seconds (32 bits).
-- Logical shard ID (10 bits).
-- Sequence number (22 bits).
+Created since I wanted to have IDs which are:
+- Mostly incremental, to keep clustered indices on databases fast.
+- Roughly-ordered for time based sorting.
+- Random enough to be unique.
+- Can fit in 64 bits (better cache usage, less space needed).
+- Out of the box integer and pretty / url safe representations.
+- Easy to use, but can easily transition to a more advanced setup with sharding later if needed.
 
 ## Example
 
@@ -25,6 +28,11 @@ sequence_number = 5541
 ```
 
 ## Properties
+
+The IDs store the following in binary form (in this order):
+- Time since custom epoch in seconds (32 bits).
+- Logical shard ID (10 bits).
+- Sequence number (22 bits).
 
 Some nice properties of having an auto-incrementing sequence as the most significant part of the resulting ID are:
 - Reduced performance impact when using clustered indices on relational databases (vs random UUIDs).
