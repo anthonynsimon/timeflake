@@ -3,6 +3,10 @@
 ## Next
 - 
 
+## 0.3.0
+- Switch to using 128-bit version of Timeflake.
+- Improved API and conversion to various representations.
+
 ## 0.2.0
 - When using the random method, it will now use the 32 bits available.
 - Use base62 encoding for more standard alphabet.
