@@ -1,113 +1,69 @@
-import math
-import os
 import time
+import uuid
+from functools import lru_cache
 
 from timeflake.utils import atoi, itoa
 
-# Default epoch for timestamp part
-# 2020-01-01T00:00:00Z
-DEFAULT_EPOCH = 1577836800
-DEFAULT_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-MAX_SEQUENCE_NUMBER = 4194303
-
-TIMESTAMP_MASK = ((1 << 32) - 1) << 32
-SHARD_MASK = ((1 << 10) - 1) << 22
-SEQUENCE_MASK = (1 << 22) - 1
+BASE54 = "0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz"
+HEX = "0123456789abcdef"
+MAX_TIMESTAMP = 281474976710655
+MAX_RANDOM = 1208925819614629174706175
+MAX_TIMEFLAKE = 340282366920938463463374607431768211455
 
 
 class Timeflake:
-    """
-    Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs.
-    
-    When using the random method, you should expect a collision to occur if you're creating
-    IDs at a rate of 77,162 within a single second.
-    
-    Once that is not enough, you can transition to using the '.next()' method (shard + counter instead of random),
-    giving you 4,194,304 IDs per shard per second.
-    
-    Please be aware that system clocks can go backwards, and leap seconds can change these probabilities.
-    
-    When using the default epoch (2020-01-01), the IDs will run out at around 2156-02-07T07:28:15Z,
-    giving you 100+ years of IDs.
-    
-    Params:
-    :param shard_id: an int between 0 and 1023 representing the assigned logical shard id
-    (or random if not provided).
-    :param encoding: valid values are 'uint64' and 'base62' (default).
-    :param epoch: the custom epoch.
-    :param timefunc: a time function which returns the current unix time in seconds as an
-    int (optionally with millis as decimal points).
-    """
-
-    def __init__(
-        self, shard_id=None, encoding="base62", epoch=DEFAULT_EPOCH, timefunc=time.time
-    ):
-        if shard_id is None:
-            self._shard_id = int.from_bytes(os.urandom(2), "big", signed=False) >> 6
-        else:
-            if not isinstance(shard_id, int):
-                raise ValueError("shard_id must be an int (no decimal points)")
-            if not (0 <= shard_id <= 1023):
-                raise ValueError("shard_id must be between 0 and 1023")
-            self._shard_id = shard_id
-
-        if encoding not in {"base62", "uint64"}:
-            raise ValueError("Encoding must be one of 'base62' or 'uint64'")
-
-        self._epoch = epoch
-        self._last_tick = 0
-        self._sequence = -1
-        self._encoding = encoding
-        self._timefunc = timefunc
+    def __init__(self, from_bytes: bytes):
+        if from_bytes is None:
+            raise ValueError("from_bytes is a required parameter")
+        self._bytes = from_bytes
+        # Validate flake
+        as_int = self.int
+        if as_int < 0 or MAX_TIMEFLAKE < as_int:
+            raise ValueError("Invalid flake provided")
 
     @property
-    def shard_id(self):
-        return self._shard_id
+    def bytes(self) -> bytes:
+        return self._bytes
 
     @property
-    def epoch(self):
-        return self._epoch
+    def uuid(self) -> uuid.UUID:
+        return uuid.UUID(bytes=self.bytes)
 
-    def next(self):
-        """
-        Returns a new UUID using the next sequence number increment for the assigned shard ID.
-        """
-        timestamp = int(self._timefunc() - self._epoch)
-        if timestamp > self._last_tick:
-            self._last_tick = timestamp
-            self._sequence = -1
-        seq = (self._sequence + 1) % MAX_SEQUENCE_NUMBER
-        flake = timestamp << 32 | self._shard_id << 22 | seq
-        self._sequence = seq
-        return self._encode(flake)
+    @property
+    def int(self) -> int:
+        return int.from_bytes(self.bytes, "big", signed=False)
 
-    def random(self):
-        """
-        Returns a new UUID using cryptographically strong pseudo-random numbers for the sequence number.
-        """
-        timestamp = int(self._timefunc() - self._epoch)
-        random = int.from_bytes(os.urandom(4), "big", signed=False)
-        flake = (timestamp << 32) | random
-        return self._encode(flake)
+    @property
+    @lru_cache(1)
+    def hex(self) -> str:
+        return itoa(self.int, HEX, padding=32)
 
-    def parse(self, flake):
-        """
-        Parses a flake and returns a tuple with the parts: (timestamp, shard_id, sequence_number).
-        """
-        flake = self._decode(flake)
-        timestamp = self._epoch + ((flake & TIMESTAMP_MASK) >> 32)
-        shard_id = (flake & SHARD_MASK) >> 22
-        sequence_number = flake & SEQUENCE_MASK
-        return (timestamp, shard_id, sequence_number)
+    @property
+    @lru_cache(1)
+    def base54(self) -> str:
+        return itoa(self.int, BASE54, padding=23)
 
-    def _encode(self, value):
-        if self._encoding == "base62":
-            return itoa(value, DEFAULT_ALPHABET)
-        elif self._encoding == "uint64":
-            return value
+    @property
+    def timestamp(self) -> int:
+        return self.int >> 80
 
-    def _decode(self, value):
-        if self._encoding == "base62":
-            return atoi(value, DEFAULT_ALPHABET)
-        elif self._encoding == "uint64":
-            return value
+    @property
+    def random(self) -> int:
+        return self.int & MAX_RANDOM
+
+    def __hash__(self) -> int:
+        return self.int
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Timeflake):
+            return False
+        return other.int == self.int
+
+    def __lt__(self, other) -> bool:
+        return self.int < other.int
+
+    def __repr__(self) -> str:
+        return f"Timeflake(base54='{self.base54}')"
+
+    def __str__(self) -> str:
+        return self.base54

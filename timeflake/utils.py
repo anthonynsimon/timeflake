@@ -1,37 +1,47 @@
 from functools import lru_cache
-from typing import Dict
 
 
-@lru_cache(1)
-def _inverted_index_alphabet(alphabet) -> Dict[str, int]:
-    return {ch: i for i, ch in enumerate(alphabet)}
+@lru_cache(2)
+def _index_alphabet(alphabet):
+    return {char: i for i, char in enumerate(alphabet)}
 
 
-@lru_cache(1)
-def _index_alphabet(alphabet) -> Dict[int, str]:
-    return {i: ch for i, ch in enumerate(alphabet)}
-
-
-def itoa(num: int, alphabet: str) -> str:
+def itoa(value, alphabet, padding=None):
     """
-    Converts an int to a str, using the given alphabet.
+    Converts an int value to a str, using the given alphabet.
+    Padding can be computed as: ceil(log of max_val base alphabet_len)
     """
+    if value < 0:
+        raise ValueError("Only positive numbers are allowed")
+    elif value == 0:
+        return alphabet[0]
+
+    result = ""
+    base = len(alphabet)
+
+    while value:
+        value, rem = divmod(value, base)
+        result = alphabet[rem] + result
+
+    if padding:
+        fill = max(padding - len(result), 0)
+        result = (alphabet[0] * fill) + result
+
+    return result
+
+
+def atoi(value, alphabet):
+    """
+    Converts a str value to an int, using the given alphabet.
+    """
+    if value == alphabet[0]:
+        return 0
+
     index = _index_alphabet(alphabet)
-    value = ""
+    result = 0
     base = len(alphabet)
-    while num:
-        num, rem = divmod(num, base)
-        value = index[rem] + value
-    return value
 
-
-def atoi(value: str, alphabet: str) -> int:
-    """
-    Converts a str to an int, using the given alphabet.
-    """
-    index = _inverted_index_alphabet(alphabet)
-    num = 0
-    base = len(alphabet)
     for char in value:
-        num = num * base + index[char]
-    return num
+        result = result * base + index[char]
+
+    return result

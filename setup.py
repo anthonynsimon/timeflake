@@ -17,7 +17,7 @@ setup(
     version=__version__,
     author="Anthony Najjar Simon",
     url="https://github.com/anthonynsimon/timeflake",
-    description="Timeflakes are 64-bit roughly-ordered, globally-unique, URL-safe UUIDs.",
+    description="Timeflake is a 128-bit, roughly-ordered, URL-safe UUID. Inspired by Twitter's Snowflake, Instagram's ID and Firebase's PushID.",
     long_description=README,
     long_description_content_type="text/markdown",
     license="MIT",

@@ -1,131 +1,123 @@
-import math
 import time
+import uuid
 
-from timeflake import Timeflake, DEFAULT_EPOCH
-from timeflake.flake import MAX_SEQUENCE_NUMBER
-
-
-def test_shard_id():
-    start_ts = int(time.time())
-    timeflake = Timeflake(shard_id=123)
-    flake = timeflake.next()
-    timestamp, shard_id, sequence = timeflake.parse(flake)
-    assert isinstance(flake, str)
-    assert 0 < len(flake) <= 11
-    assert start_ts <= timestamp
-    assert shard_id == 123
-    assert sequence == 0
-
-    # Test increment changed UUID
-    new_flake = timeflake.next()
-    new_timestamp, new_shard_id, new_sequence = timeflake.parse(new_flake)
-    assert isinstance(new_flake, str)
-    assert new_flake != flake
-    assert 0 < len(new_flake) <= 11
-    assert start_ts <= new_timestamp
-    assert new_shard_id == 123
-    assert new_sequence == 1
+import timeflake
+import timeflake.flake
 
 
 def test_random():
     now = int(time.time())
-    timeflake = Timeflake(timefunc=lambda: now)
-    for i in range(1000):
-        flake = timeflake.next()
-        timestamp, shard_id, sequence = timeflake.parse(flake)
-        assert isinstance(flake, str)
-        assert 0 < len(flake) <= 11
-        assert now == timestamp
-        assert 0 <= shard_id <= 1023
-        assert sequence == i
-
-
-def test_sequence_restart():
-    now = int(time.time())
-    timeflake = Timeflake(shard_id=123, timefunc=lambda: now)
-    # Let's speed up the test
-    timeflake.next()  # discard first value (it will take the timestamp here)
-    initial_sequence = MAX_SEQUENCE_NUMBER - 100
-    timeflake._sequence = initial_sequence
-
-    # Ensure sequence restarts when exceeds limit per shard_id and timestamp second
-    for i in range(initial_sequence, MAX_SEQUENCE_NUMBER - 1):
-        flake = timeflake.next()
-        timestamp, shard_id, sequence = timeflake.parse(flake)
-        assert isinstance(flake, str)
-        assert 0 < len(flake) <= 11
-        assert now == timestamp
-        assert shard_id == 123
-        assert sequence == i + 1
-
-    # Check that the sequence restarts
-    for i in range(100):
-        flake = timeflake.next()
-        timestamp, shard_id, sequence = timeflake.parse(flake)
-        assert isinstance(flake, str)
-        assert 0 < len(flake) <= 11
-        assert now == timestamp
-        assert shard_id == 123
-        assert sequence == i
-
-
-def test_uint64():
-    now = int(time.time())
-    timeflake = Timeflake(encoding="uint64", timefunc=lambda: now)
     for i in range(1000):
         flake = timeflake.random()
-        timestamp, shard_id, sequence = timeflake.parse(flake)
-        assert isinstance(flake, int)
-        assert now == timestamp
-        assert 0 <= shard_id <= 1023
-        assert sequence != i
+        assert isinstance(flake, timeflake.Timeflake)
+        rand = flake.random
+        timestamp = flake.timestamp
+        assert isinstance(rand, int)
+        assert isinstance(timestamp, int)
+        assert 0 <= flake.int <= timeflake.flake.MAX_TIMEFLAKE
+        assert now <= timestamp
+        assert 0 <= rand <= timeflake.flake.MAX_RANDOM
+        assert 0 <= timestamp <= timeflake.flake.MAX_TIMESTAMP
 
 
-def test_timestamp():
-    now = int(time.time())
-    timeflake = Timeflake()
-
-    flake1 = timeflake.next()
-    timestamp1, shard_id1, sequence1 = timeflake.parse(flake1)
-    assert isinstance(flake1, str)
-    assert now == timestamp1
-    assert sequence1 == 0
-
-    flake2 = timeflake.next()
-    timestamp2, shard_id2, sequence2 = timeflake.parse(flake2)
-    assert isinstance(flake2, str)
-    assert now == timestamp2
-    assert shard_id2 == shard_id1
-    assert sequence2 == 1
-
-    # Wait
-    time.sleep(1)
-
-    flake3 = timeflake.next()
-    timestamp3, shard_id3, sequence3 = timeflake.parse(flake3)
-    assert isinstance(flake3, str)
-    assert flake1 != flake3
-    assert flake2 != flake3
-    assert timestamp1 < timestamp3
-    assert now == timestamp3 - 1
-    assert shard_id1 == shard_id2
-    assert sequence1 == sequence3
+def test_from_values_timestamp_only():
+    now = 123
+    for i in range(1000):
+        flake = timeflake.from_values(timestamp=now)
+        assert isinstance(flake, timeflake.Timeflake)
+        assert isinstance(flake.random, int)
+        assert isinstance(flake.timestamp, int)
+        assert 0 <= flake.int <= timeflake.flake.MAX_TIMEFLAKE
+        assert 0 <= flake.random <= timeflake.flake.MAX_RANDOM
+        assert now == flake.timestamp
 
 
-def test_unsigned_uint64_to_python_int():
-    # 1 second before overflow the 32 bits of the timestamp
-    now = DEFAULT_EPOCH + int(math.pow(2, 32)) - 1
+def test_from_values_timestamp_and_random():
+    now = 123
+    rand = 456
+    for i in range(1000):
+        flake = timeflake.from_values(timestamp=now, random=rand)
+        assert isinstance(flake, timeflake.Timeflake)
+        assert isinstance(flake.random, int)
+        assert isinstance(flake.timestamp, int)
+        assert 0 <= flake.int <= timeflake.flake.MAX_TIMEFLAKE
+        assert now == flake.timestamp
+        assert rand == flake.random
 
-    expected_bin = 0b1111111111111111111111111111111111111111110000000000000000000000
-    timeflake = Timeflake(shard_id=1023, timefunc=lambda: now, encoding="uint64")
-    for i in range(10):
-        flake = timeflake.next()
-        timestamp, shard_id, sequence = timeflake.parse(flake)
-        flake_bin = bin(flake)
-        num_bytes = len(flake_bin[2:])
-        assert flake > 0
-        assert num_bytes == 64
-        assert bin(expected_bin + i) == flake_bin
-        assert timestamp == 5872804095
-        assert shard_id == 1023
-        assert sequence == i
+
+def test_parse_base54_and_conversions():
+    flake = timeflake.parse(from_base54="00mx79Rjxvfgr8qat2CeQDs")
+    assert isinstance(flake, timeflake.Timeflake)
+    assert isinstance(flake.random, int)
+    assert isinstance(flake.timestamp, int)
+    assert flake.timestamp == 1579091935216
+    assert flake.random == 724773312193627487660233
+    assert flake.int == 1909005012028578488143182045514754249
+    assert flake.hex == "016fa936bff0997a0a3c428548fee8c9"
+    assert flake.base54 == "00mx79Rjxvfgr8qat2CeQDs"
+    assert flake.bytes == b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9"
+    assert flake.uuid == uuid.UUID("016fa936-bff0-997a-0a3c-428548fee8c9")
+
+
+def test_parse_bytes_and_conversions():
+    flake = timeflake.parse(from_bytes=b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9")
+    assert isinstance(flake, timeflake.Timeflake)
+    assert isinstance(flake.random, int)
+    assert isinstance(flake.timestamp, int)
+    assert flake.timestamp == 1579091935216
+    assert flake.random == 724773312193627487660233
+    assert flake.int == 1909005012028578488143182045514754249
+    assert flake.hex == "016fa936bff0997a0a3c428548fee8c9"
+    assert flake.base54 == "00mx79Rjxvfgr8qat2CeQDs"
+    assert flake.bytes == b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9"
+    assert flake.uuid == uuid.UUID("016fa936-bff0-997a-0a3c-428548fee8c9")
+
+
+def test_parse_hex_and_conversions():
+    flake = timeflake.parse(from_hex="016fa936bff0997a0a3c428548fee8c9")
+    assert isinstance(flake, timeflake.Timeflake)
+    assert isinstance(flake.random, int)
+    assert isinstance(flake.timestamp, int)
+    assert flake.timestamp == 1579091935216
+    assert flake.random == 724773312193627487660233
+    assert flake.int == 1909005012028578488143182045514754249
+    assert flake.hex == "016fa936bff0997a0a3c428548fee8c9"
+    assert flake.base54 == "00mx79Rjxvfgr8qat2CeQDs"
+    assert flake.bytes == b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9"
+    assert flake.uuid == uuid.UUID("016fa936-bff0-997a-0a3c-428548fee8c9")
+
+
+def test_parse_int_and_conversions():
+    flake = timeflake.parse(from_int=1909005012028578488143182045514754249)
+    assert isinstance(flake, timeflake.Timeflake)
+    assert isinstance(flake.random, int)
+    assert isinstance(flake.timestamp, int)
+    assert flake.timestamp == 1579091935216
+    assert flake.random == 724773312193627487660233
+    assert flake.int == 1909005012028578488143182045514754249
+    assert flake.hex == "016fa936bff0997a0a3c428548fee8c9"
+    assert flake.base54 == "00mx79Rjxvfgr8qat2CeQDs"
+    assert flake.bytes == b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9"
+    assert flake.uuid == uuid.UUID("016fa936-bff0-997a-0a3c-428548fee8c9")
+
+
+def test_timestamp_increment():
+    flake1 = timeflake.random()
+    time.sleep(0.4)
+    flake2 = timeflake.random()
+    time.sleep(1.1)
+    flake3 = timeflake.random()
+
+    assert flake1 < flake2 < flake3
+    assert flake1.timestamp < flake2.timestamp < flake3.timestamp
+    assert len(set([flake1.timestamp, flake2.timestamp, flake3.timestamp])) == 3
+
+
+def test_uniqueness():
+    seen = set()
+    for i in range(int(1e6)):
+        flake = timeflake.random()
+        key = flake.base54
+        if key in seen:
+            raise Exception(f"Flake collision found after {i} generations")
+        seen.add(flake.base54)
