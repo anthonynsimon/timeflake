@@ -2,6 +2,7 @@
 
 ## 0.3.1
 - Use base62 as the canonical encoding.
+- Include django model field extension module.
 
 ## 0.3.0
 - Switch to using 128-bit version of Timeflake.

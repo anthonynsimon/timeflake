@@ -7,8 +7,8 @@ Timeflake is a 128-bit, roughly-ordered, URL-safe UUID. Inspired by Twitter's Sn
 ## Features
 
 - **Fast.** Roughly ordered (K-sortable), incremental timestamp in most significant bits enables faster indexing and less fragmentation on database indices (vs UUID v1/v4).
-- **Efficient.** 128 bits: 48 bits for timestamp + 80 bits of cryptographically generated random numbers.
-- **Safe.** With 1.2e+24 unique Timeflakes per millisecond, even if generating 50 million IDs per millisecond the chance of a collision is still 1 in a billion. Only likely to see a collision if generating 1.3e+12 (one trillion three hundred billion) IDs per millisecond.
+- **Safe.** With 1.2e+24 unique timeflakes per millisecond, even if you're creating 50 million of them *per millisecond* the chance of a collision is still 1 in a billion. You're likely to see a collision when creating 1.3e+12 (one trillion three hundred billion) timeflakes per millisecond.
+- **Efficient.** 128 bits are used to encode a timestamp in milliseconds (48 bits) and a cryptographically generated random number (80 bits).
 - **Flexible.** Out of the box encodings in 128-bit unsigned int, hex, URL-safe base62 and raw bytes.
 
 
@@ -79,8 +79,21 @@ hex    = 016fb4209023b444fd07590f81b7b0eb
 base62 = 02i2XhN7hAuaFh3MwztcMd
 ```
 
+## Provided extensions
+### Django model fields
+You can use timeflakes as primary keys for your models. These fields currently support MySQL, Postgres and Sqlite3.
+
+Example usage:
+```python
+from timeflake.extensions.django import TimeflakePrimaryKeyBinary
+
+class Item(models.Model):
+    item_id = TimeflakePrimaryKeyBinary()
+    # ...
+```
+
 ## Note on security
-Since the timestamp is predictable, the search space within any given millisecond is 2^80 random numbers, which is meant to avoid collisions, not to secure information. Even so, it would be hard to guess any one Timeflake depending on the creation rate, it is not recommended to use them for security purposes, only for uniquely identifying resources.
+Since the timestamp part is predictable, the search space within any given millisecond is 2^80 random numbers, which is meant to avoid collisions, not to secure or hide information. You should not be using timeflakes for password-reset tokens, API keys or for anything which is security sensitive.
 
 ## Supported versions
 Right now the codebase is only tested with Python 3.7+.

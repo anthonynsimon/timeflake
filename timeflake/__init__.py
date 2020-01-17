@@ -1,11 +1,11 @@
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __all__ = ["Timeflake", "random", "from_values"]
 
 import os
 import time
 from typing import Optional
 
-from timeflake.flake import Timeflake, HEX, BASE62
+from timeflake.flake import BASE62, HEX, Timeflake
 from timeflake.utils import atoi
 
 
