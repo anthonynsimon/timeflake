@@ -117,3 +117,9 @@ Please see the [changelog](CHANGELOG.md) for more details.
 
 ## License
 This project is licensed under the MIT license. Please read the [LICENSE](LICENSE) file for more details.
+
+## Prior art
+
+- [Sharding & IDs at Instagram](https://instagram-engineering.com/sharding-ids-at-instagram-1cf5a71e5a5c)
+- [Announcing Snowflake: Twitter](https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html)
+- [The 2^120 Ways to Ensure Unique Identifiers](https://firebase.googleblog.com/2015/02/the-2120-ways-to-ensure-unique_68.html)
