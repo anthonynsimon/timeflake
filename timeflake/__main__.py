@@ -30,7 +30,7 @@ def main():
         flake = timeflake.random()
         if args.verbose:
             print(
-                f"ts={flake.timestamp}\trand={flake.random}\tint={flake.int}\thex={flake.hex}\tbase54={flake.base54}"
+                f"ts={flake.timestamp}\trand={flake.random}\tint={flake.int}\thex={flake.hex}\tbase62={flake.base62}"
             )
         else:
             print(flake)

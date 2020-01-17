@@ -4,7 +4,7 @@ from functools import lru_cache
 
 from timeflake.utils import atoi, itoa
 
-BASE54 = "0123456789ABCDEFGHJKMNPQRSTVWXYZabcdefghjkmnpqrstvwxyz"
+BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 HEX = "0123456789abcdef"
 MAX_TIMESTAMP = 281474976710655
 MAX_RANDOM = 1208925819614629174706175
@@ -40,8 +40,8 @@ class Timeflake:
 
     @property
     @lru_cache(1)
-    def base54(self) -> str:
-        return itoa(self.int, BASE54, padding=23)
+    def base62(self) -> str:
+        return itoa(self.int, BASE62, padding=22)
 
     @property
     def timestamp(self) -> int:
@@ -63,7 +63,7 @@ class Timeflake:
         return self.int < other.int
 
     def __repr__(self) -> str:
-        return f"Timeflake(base54='{self.base54}')"
+        return f"Timeflake('{self.hex}')"
 
     def __str__(self) -> str:
-        return self.base54
+        return self.base62

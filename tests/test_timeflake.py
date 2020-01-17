@@ -45,8 +45,8 @@ def test_from_values_timestamp_and_random():
         assert rand == flake.random
 
 
-def test_parse_base54_and_conversions():
-    flake = timeflake.parse(from_base54="00mx79Rjxvfgr8qat2CeQDs")
+def test_parse_base62_and_conversions():
+    flake = timeflake.parse(from_base62="02i1KoFfY3auBS745gImbZ")
     assert isinstance(flake, timeflake.Timeflake)
     assert isinstance(flake.random, int)
     assert isinstance(flake.timestamp, int)
@@ -54,7 +54,7 @@ def test_parse_base54_and_conversions():
     assert flake.random == 724773312193627487660233
     assert flake.int == 1909005012028578488143182045514754249
     assert flake.hex == "016fa936bff0997a0a3c428548fee8c9"
-    assert flake.base54 == "00mx79Rjxvfgr8qat2CeQDs"
+    assert flake.base62 == "02i1KoFfY3auBS745gImbZ"
     assert flake.bytes == b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9"
     assert flake.uuid == uuid.UUID("016fa936-bff0-997a-0a3c-428548fee8c9")
 
@@ -68,7 +68,7 @@ def test_parse_bytes_and_conversions():
     assert flake.random == 724773312193627487660233
     assert flake.int == 1909005012028578488143182045514754249
     assert flake.hex == "016fa936bff0997a0a3c428548fee8c9"
-    assert flake.base54 == "00mx79Rjxvfgr8qat2CeQDs"
+    assert flake.base62 == "02i1KoFfY3auBS745gImbZ"
     assert flake.bytes == b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9"
     assert flake.uuid == uuid.UUID("016fa936-bff0-997a-0a3c-428548fee8c9")
 
@@ -82,7 +82,7 @@ def test_parse_hex_and_conversions():
     assert flake.random == 724773312193627487660233
     assert flake.int == 1909005012028578488143182045514754249
     assert flake.hex == "016fa936bff0997a0a3c428548fee8c9"
-    assert flake.base54 == "00mx79Rjxvfgr8qat2CeQDs"
+    assert flake.base62 == "02i1KoFfY3auBS745gImbZ"
     assert flake.bytes == b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9"
     assert flake.uuid == uuid.UUID("016fa936-bff0-997a-0a3c-428548fee8c9")
 
@@ -96,7 +96,7 @@ def test_parse_int_and_conversions():
     assert flake.random == 724773312193627487660233
     assert flake.int == 1909005012028578488143182045514754249
     assert flake.hex == "016fa936bff0997a0a3c428548fee8c9"
-    assert flake.base54 == "00mx79Rjxvfgr8qat2CeQDs"
+    assert flake.base62 == "02i1KoFfY3auBS745gImbZ"
     assert flake.bytes == b"\x01o\xa96\xbf\xf0\x99z\n<B\x85H\xfe\xe8\xc9"
     assert flake.uuid == uuid.UUID("016fa936-bff0-997a-0a3c-428548fee8c9")
 
@@ -117,7 +117,8 @@ def test_uniqueness():
     seen = set()
     for i in range(int(1e6)):
         flake = timeflake.random()
-        key = flake.base54
+        key = flake.base62
         if key in seen:
             raise Exception(f"Flake collision found after {i} generations")
-        seen.add(flake.base54)
+        assert len(key) == 22
+        seen.add(flake.base62)

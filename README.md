@@ -9,7 +9,7 @@ Timeflake is a 128-bit, roughly-ordered, URL-safe UUID. Inspired by Twitter's Sn
 - **Fast.** Roughly ordered (K-sortable), incremental timestamp in most significant bits enables faster indexing and less fragmentation on database indices (vs UUID v1/v4).
 - **Efficient.** 128 bits: 48 bits for timestamp + 80 bits of cryptographically generated random numbers.
 - **Safe.** With 1.2e+24 unique Timeflakes per millisecond, even if generating 50 million IDs per millisecond the chance of a collision is still 1 in a billion. Only likely to see a collision if generating 1.3e+12 (one trillion three hundred billion) IDs per millisecond.
-- **Flexible.** Out of the box encodings in 128-bit unsigned int, hex, URL-safe base54 and raw bytes.
+- **Flexible.** Out of the box encodings in 128-bit unsigned int, hex, URL-safe base62 and raw bytes.
 
 
 ## Usage
@@ -19,10 +19,10 @@ import timeflake
 
 # Create a random Timeflake
 flake = timeflake.random()
->>> Timeflake(base54='00mx79Rjxvfgr8qat2CeQDs')
+>>> Timeflake(base62='00mx79Rjxvfgr8qat2CeQDs')
 
-# Get the base54, int, hex or bytes representation
-flake.base54
+# Get the base62, int, hex or bytes representation
+flake.base62
 >>> '00mx79Rjxvfgr8qat2CeQDs'
 
 flake.hex
@@ -47,33 +47,37 @@ flake.random
 >>> 724773312193627487660233
 
 # Parse an existing flake (you can also pass bytes, hex or int representations)
-timeflake.parse(from_base54='0002HCZffkHWhKPVdXxs0YH')
->>> Timeflake(base54='0002HCZffkHWhKPVdXxs0YH')
+timeflake.parse(from_base62='0002HCZffkHWhKPVdXxs0YH')
+>>> Timeflake(base62='0002HCZffkHWhKPVdXxs0YH')
 
 # Create from a user defined timestamp or random value:
 timeflake.from_values(timestamp=123, random=5)
->>> Timeflake(base54='00000001Wx2f4jQ0eTmSGKB')
+>>> Timeflake('016fb4209023b444fd07590f81b7b0eb')
 ```
 
 
 ## Components
 
-```
-int    = 1909000258500378892484423800037704
-hex    = 00005e1ef88330b3047494e25453a148
-base54 = 0002HCZ1ZqmGbaJ8YJXyp0j
-```
-
-The timeflake `0002HCZ1ZqmGbaJ8YJXyp0j` (base54) encodes the following:
+The timeflake `02i2XhN7hAuaFh3MwztcMd` (base62) encodes the following:
 ```
 # Milliseconds since unix epoch
-timestamp = 1579088003
+timestamp = 1579275030563
 
 # Cryptographically generated random number
-random    = 229975879412110228431176
+random    = 851298578153087956398315
 ```
 
-The `hex` representation has a max length of 32 characters, while the `base54` will be 23 characters.
+## Alphabets
+
+The canonical representation is using a custom base62 alphabet, modified to preserve lexicographical order when sorting strings using this encoding. The `hex` representation has a max length of 32 characters, while the `base62` will be 22 characters. Padding is required to be able to derive the encoding from the string length.
+
+The following are all valid representations of the same Timeflake:
+
+```
+int    = 1909226360721144613344160656901255403
+hex    = 016fb4209023b444fd07590f81b7b0eb
+base62 = 02i2XhN7hAuaFh3MwztcMd
+```
 
 ## Note on security
 Since the timestamp is predictable, the search space within any given millisecond is 2^80 random numbers, which is meant to avoid collisions, not to secure information. Even so, it would be hard to guess any one Timeflake depending on the creation rate, it is not recommended to use them for security purposes, only for uniquely identifying resources.

@@ -5,24 +5,24 @@ import os
 import time
 from typing import Optional
 
-from timeflake.flake import Timeflake, HEX, BASE54
+from timeflake.flake import Timeflake, HEX, BASE62
 from timeflake.utils import atoi
 
 
 def parse(
-    from_bytes: bytes = None, from_int=None, from_hex=None, from_base54=None
+    from_bytes: bytes = None, from_int=None, from_hex=None, from_base62=None
 ) -> Timeflake:
     b = None
     if from_bytes is not None:
         b = from_bytes
-    elif from_base54 is not None:
-        b = atoi(from_base54, BASE54).to_bytes(16, "big")
+    elif from_base62 is not None:
+        b = atoi(from_base62, BASE62).to_bytes(16, "big")
     elif from_hex is not None:
         b = atoi(from_hex.lower(), HEX).to_bytes(16, "big")
     elif from_int is not None:
         b = from_int.to_bytes(16, "big")
     else:
-        raise ValueError("Must provide one of {bytes, int, hex, base54} ")
+        raise ValueError("Must provide one of {bytes, int, hex, base62} ")
     return Timeflake(from_bytes=b)
 
 

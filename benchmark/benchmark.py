@@ -3,10 +3,10 @@ import timeit
 
 def main():
     res = timeit.timeit(
-        "timeflake.parse(from_base54=value)",
-        setup="import timeflake; value = timeflake.random().base54",
+        "timeflake.parse(from_base62=value)",
+        setup="import timeflake; value = timeflake.random().base62",
     )
-    print(f"timeflake.parse(from_base54): {res}")
+    print(f"timeflake.parse(from_base62): {res}")
 
     res = timeit.timeit(
         "timeflake.parse(from_bytes=value)",
