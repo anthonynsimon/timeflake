@@ -48,11 +48,11 @@ flake.random
 
 # Parse an existing flake (you can also pass bytes, hex or int representations)
 timeflake.parse(from_base62='0002HCZffkHWhKPVdXxs0YH')
->>> Timeflake(base62='0002HCZffkHWhKPVdXxs0YH')
+>>> Timeflake('0004fbc6872f70fc9e27355a499e8b6d')
 
 # Create from a user defined timestamp or random value:
-timeflake.from_values(timestamp=123, random=5)
->>> Timeflake('016fb4209023b444fd07590f81b7b0eb')
+timeflake.from_values(1579091935216, 724773312193627487660233)
+>>> Timeflake('016fa936bff0997a0a3c428548fee8c9')
 ```
 
 
@@ -113,7 +113,7 @@ Simply follow the next steps:
 - In case you want to add a feature, please create a new issue and briefly explain what the feature would consist of. For bugs or requests, before creating an issue please check if one has already been created for it.
 
 ## Changelog
-Please see the [changelog](CHANGELOG.md) for more details.
+Please see the [CHANGELOG](CHANGELOG.md) for more details.
 
 ## License
 This project is licensed under the MIT license. Please read the [LICENSE](LICENSE) file for more details.

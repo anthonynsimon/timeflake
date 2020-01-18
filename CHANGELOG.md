@@ -2,6 +2,8 @@
 
 ## 0.3.2
 - Fix str to instance conversion on Django extension.
+- Minor documentation improvements.
+
 ## 0.3.1
 - Use base62 as the canonical encoding.
 - Include django model field extension module.
