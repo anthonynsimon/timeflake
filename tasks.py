@@ -22,11 +22,11 @@ def clean(ctx):
     ctx.run("python setup.py clean --all")
 
 
-@invoke.task(test, clean)
+@invoke.task(clean)
 def build(ctx):
     ctx.run("python setup.py sdist bdist_wheel")
 
 
-@invoke.task(fmt, build)
+@invoke.task(fmt, test, build)
 def publish(ctx):
     ctx.run("twine upload dist/*")
