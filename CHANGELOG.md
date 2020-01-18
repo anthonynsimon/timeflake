@@ -1,5 +1,8 @@
 # Changelog
 
+# 0.3.3
+- Minor bug fixes.
+
 ## 0.3.2
 - Fix str to instance conversion on Django extension.
 - Minor documentation improvements.

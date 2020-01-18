@@ -36,7 +36,7 @@ class TimeflakeBinary(models.Field):
         super(TimeflakeBinary, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(TimeflakeBinary).deconstruct()
+        name, path, args, kwargs = super(TimeflakeBinary, self).deconstruct()
         return name, path, args, kwargs
 
     def db_type(self, connection):
@@ -87,7 +87,7 @@ class TimeflakePrimaryKeyBinary(TimeflakeBinary):
         super(TimeflakePrimaryKeyBinary, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(TimeflakeBinary).deconstruct()
+        name, path, args, kwargs = super(TimeflakePrimaryKeyBinary, self).deconstruct()
         del kwargs["primary_key"]
         del kwargs["editable"]
         del kwargs["default"]
