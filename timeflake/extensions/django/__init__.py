@@ -1,7 +1,10 @@
 import uuid
 
 import timeflake
+from django import forms
+from django.core import exceptions
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 
 def _parse(value) -> timeflake.Timeflake:
@@ -33,7 +36,7 @@ class TimeflakeBinary(models.Field):
         super(TimeflakeBinary, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
+        name, path, args, kwargs = super(TimeflakeBinary).deconstruct()
         return name, path, args, kwargs
 
     def db_type(self, connection):
@@ -52,18 +55,28 @@ class TimeflakeBinary(models.Field):
         return self.db_type(connection)
 
     def from_db_value(self, value, expression, connection):
-        return _parse(value)
+        return self.to_python(value)
 
     def to_python(self, value):
-        return _parse(value)
+        try:
+            return _parse(value)
+        except (AttributeError, ValueError):
+            raise exceptions.ValidationError(
+                self.error_messages["invalid"], code="invalid", params={"value": value},
+            )
 
     def get_db_prep_value(self, value, connection, prepared=False):
         value = super().get_db_prep_value(value, connection, prepared)
-        if value is not None:
-            if connection.vendor == "postgresql":
-                return value.uuid
-            return value.bytes
-        return value
+        if value is None:
+            return value
+        if not isinstance(value, timeflake.Timeflake):
+            value = self.to_python(value)
+        if connection.vendor == "postgresql":
+            return value.uuid
+        return value.bytes
+
+    def formfield(self, **kwargs):
+        return super().formfield(**{"form_class": forms.UUIDField, **kwargs,})
 
 
 class TimeflakePrimaryKeyBinary(TimeflakeBinary):
@@ -72,3 +85,10 @@ class TimeflakePrimaryKeyBinary(TimeflakeBinary):
         kwargs["editable"] = False
         kwargs["default"] = timeflake.random
         super(TimeflakePrimaryKeyBinary, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(TimeflakeBinary).deconstruct()
+        del kwargs["primary_key"]
+        del kwargs["editable"]
+        del kwargs["default"]
+        return name, path, args, kwargs
