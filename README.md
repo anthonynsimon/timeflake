@@ -1,5 +1,9 @@
 
 # Timeflake
+[![PyPi Latest Version](https://img.shields.io/pypi/v/timeflake)](https://pypi.org/project/timeflake/)
+[![PyPi Downloads](https://img.shields.io/pypi/dw/timeflake)](https://pypi.org/project/timeflake/)
+[![CircleCI Build Status](https://img.shields.io/circleci/build/github/anthonynsimon/timeflake/master)](https://circleci.com/gh/anthonynsimon/timeflake)
+[![License](https://img.shields.io/github/license/anthonynsimon/timeflake)](https://github.com/anthonynsimon/timeflake/blob/master/LICENSE)
 
 Timeflake is a 128-bit, roughly-ordered, URL-safe UUID. Inspired by Twitter's Snowflake, Instagram's ID and Firebase's PushID.
 
