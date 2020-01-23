@@ -84,11 +84,11 @@ base62 = 02i2XhN7hAuaFh3MwztcMd
 ```
 
 ## Why?
-I built this for a project which required the following properties:
-- Efficient on MySQL/Postgres indices.
-- Can be generated in a distributed system without coordination.
-- Difficult enough to predict, so can be used in URLs (vs auto-increment integers).
-- Compatible with standard 128-bit UUID representations (many libraries in Python handle `uuid.UUID`, but not a third-party UUID type).
+This could be useful to you, if you're looking for a UUID with the following properties:
+- You want to have UUIDs in URLs that are not predictable (vs auto-increment integers).
+- So they should be random, but roughly-ordered over time so that your MySQL/Postgres indices stay fast and efficient as the dataset grows.
+- And simple to use across multiple machines (no coordination or centralized system required to generate).
+- It would be nice if they were compatible with standard 128-bit UUID representations (many libraries in Python handle uuid.UUID, but no third-party types).
 
 Some existing alternatives which I considered:
 - **UUIDv1** but the timestamp bytes are not sequential and gives away network information.
