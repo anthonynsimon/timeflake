@@ -110,7 +110,7 @@ class Item(models.Model):
 ```
 
 ## Note on security
-Since the timestamp part is predictable, the search space within any given millisecond is 2^80 random numbers, which is meant to avoid collisions, not to secure or hide information. You should not be using timeflakes for password-reset tokens, API keys or for anything which is security sensitive.
+Since the timestamp part is predictable, the search space within any given millisecond is 2^80 random numbers, which is meant to avoid collisions, not to secure or hide information. You should not be using timeflakes for password-reset tokens, API keys or for anything which is security sensitive. There are better libraries which are meant for this use case (for example, the standard library's [secrets module](https://docs.python.org/3/library/secrets.html)).
 
 ## Supported versions
 Right now the codebase is only tested with Python 3.7+.
