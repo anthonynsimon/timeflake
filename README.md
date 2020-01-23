@@ -73,7 +73,7 @@ random    = 851298578153087956398315
 
 ## Alphabets
 
-The canonical representation is using a custom base62 alphabet, modified to preserve lexicographical order when sorting strings using this encoding. The `hex` representation has a max length of 32 characters, while the `base62` will be 22 characters. Padding is required to be able to derive the encoding from the string length.
+A custom base62 alphabet representation is included, modified to preserve lexicographical order when sorting strings using this encoding. The `hex` representation has a max length of 32 characters, while the `base62` will be 22 characters. Padding is required to be able to derive the encoding from the string length.
 
 The following are all valid representations of the same Timeflake:
 
@@ -82,6 +82,19 @@ int    = 1909226360721144613344160656901255403
 hex    = 016fb4209023b444fd07590f81b7b0eb
 base62 = 02i2XhN7hAuaFh3MwztcMd
 ```
+
+## Why?
+I built this for a project which required the following properties:
+- Efficient on MySQL/Postgres indices.
+- Can be generated in a distributed system without coordination.
+- Difficult enough to predict, so can be used in URLs (vs auto-increment integers).
+- Compatible with standard 128-bit UUID representations (many libraries in Python handle `uuid.UUID`, but not a third-party UUID type).
+
+Some existing alternatives which I considered:
+- **UUIDv1** but the timestamp bytes are not sequential and gives away network information.
+- **UUIDv4** but they're mostly random, and can mess up the performance on clustered indices.
+- **ULID** but approach to incrementing the sequence during same millisecond makes it more predictable.
+- **KSUID** but it's 160-bit, so unfortunately not compatible with standard 128-bit UUIDs.
 
 ## Provided extensions
 ### Django model fields
