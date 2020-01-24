@@ -13,7 +13,7 @@ Timeflake is a 128-bit, roughly-ordered, URL-safe UUID. Inspired by Twitter's Sn
 - **Fast.** Roughly ordered (K-sortable), incremental timestamp in most significant bits enables faster indexing and less fragmentation on database indices (vs UUID v1/v4).
 - **Safe.** With 1.2e+24 unique timeflakes per millisecond, even if you're creating 50 million of them *per millisecond* the chance of a collision is still 1 in a billion. You're likely to see a collision when creating 1.3e+12 (one trillion three hundred billion) timeflakes per millisecond.
 - **Efficient.** 128 bits are used to encode a timestamp in milliseconds (48 bits) and a cryptographically generated random number (80 bits).
-- **Flexible.** Out of the box encodings in 128-bit unsigned int, hex, URL-safe base62 and raw bytes.
+- **Flexible.** Out of the box encodings in 128-bit unsigned int, hex, URL-safe base62 and raw bytes. Fully compatible with uuid.UUID.
 
 
 ## Usage
@@ -86,8 +86,8 @@ base62 = 02i2XhN7hAuaFh3MwztcMd
 ## Why?
 This could be useful to you, if you're looking for a UUID with the following properties:
 - You want to have UUIDs in URLs that are not predictable (vs auto-increment integers).
-- So they should be random, but roughly-ordered over time so that your MySQL/Postgres indices stay fast and efficient as the dataset grows.
-- And simple to use across multiple machines (no coordination or centralized system required to generate).
+- They should be random, but roughly-ordered over time so that your MySQL/Postgres indices stay fast and efficient as the dataset grows.
+- And simple to use across multiple machines (no coordination or centralized system required).
 - It would be nice if they were compatible with standard 128-bit UUID representations (many libraries in Python handle uuid.UUID, but no third-party types).
 
 Some existing alternatives which I considered:
