@@ -11,10 +11,11 @@ Timeflake is a 128-bit, roughly-ordered, URL-safe UUID. Inspired by Twitter's Sn
 ## Features
 
 - **Fast.** Roughly ordered (K-sortable), incremental timestamp in most significant bits enables faster indexing and less fragmentation on database indices (vs UUID v1/v4).
-- **Safe.** With 1.2e+24 unique timeflakes per millisecond, even if you're creating 50 million of them *per millisecond* the chance of a collision is still 1 in a billion. You're likely to see a collision when creating 1.3e+12 (one trillion three hundred billion) timeflakes per millisecond. While we're at it, consider how the [Birthday Paradox](https://betterexplained.com/articles/understanding-the-birthday-paradox/) might affect your use case.
+- **Unique enough.** With 1.2e+24 unique timeflakes per millisecond, even if you're creating 50 million of them *per millisecond* the chance of a collision is still 1 in a billion. You're likely to see a collision when creating 1.3e+12 (one trillion three hundred billion) timeflakes per millisecond.*
 - **Efficient.** 128 bits are used to encode a timestamp in milliseconds (48 bits) and a cryptographically generated random number (80 bits).
 - **Flexible.** Out of the box encodings in 128-bit unsigned int, hex, URL-safe base62 and raw bytes. Fully compatible with uuid.UUID.
 
+\* Please consider how the [Birthday Paradox](https://betterexplained.com/articles/understanding-the-birthday-paradox/) might affect your use case. Also read security note on this readme.
 
 ## Why?
 This could be useful to you, if you're looking for a UUID with the following properties:
