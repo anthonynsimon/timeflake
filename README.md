@@ -16,6 +16,20 @@ Timeflake is a 128-bit, roughly-ordered, URL-safe UUID. Inspired by Twitter's Sn
 - **Flexible.** Out of the box encodings in 128-bit unsigned int, hex, URL-safe base62 and raw bytes. Fully compatible with uuid.UUID.
 
 
+## Why?
+This could be useful to you, if you're looking for a UUID with the following properties:
+- You want to have UUIDs in URLs that are not predictable (vs auto-increment integers).
+- They should be random, but roughly-ordered over time so that your MySQL/Postgres indices stay fast and efficient as the dataset grows.
+- And simple to use across multiple machines (no coordination or centralized system required).
+- It would be nice if they were compatible with standard 128-bit UUID representations (many libraries in Python handle uuid.UUID, but no third-party types).
+
+Some existing alternatives which I considered:
+- **UUIDv1** but the timestamp bytes are not sequential and gives away network information.
+- **UUIDv4** but they're mostly random, and can mess up the performance on clustered indices.
+- **ULID** but approach to incrementing the sequence during same millisecond makes it more predictable.
+- **KSUID** but it's 160-bit, so unfortunately not compatible with standard 128-bit UUIDs.
+
+
 ## Usage
 
 ```python
@@ -82,19 +96,6 @@ int    = 1909226360721144613344160656901255403
 hex    = 016fb4209023b444fd07590f81b7b0eb
 base62 = 02i2XhN7hAuaFh3MwztcMd
 ```
-
-## Why?
-This could be useful to you, if you're looking for a UUID with the following properties:
-- You want to have UUIDs in URLs that are not predictable (vs auto-increment integers).
-- They should be random, but roughly-ordered over time so that your MySQL/Postgres indices stay fast and efficient as the dataset grows.
-- And simple to use across multiple machines (no coordination or centralized system required).
-- It would be nice if they were compatible with standard 128-bit UUID representations (many libraries in Python handle uuid.UUID, but no third-party types).
-
-Some existing alternatives which I considered:
-- **UUIDv1** but the timestamp bytes are not sequential and gives away network information.
-- **UUIDv4** but they're mostly random, and can mess up the performance on clustered indices.
-- **ULID** but approach to incrementing the sequence during same millisecond makes it more predictable.
-- **KSUID** but it's 160-bit, so unfortunately not compatible with standard 128-bit UUIDs.
 
 ## Provided extensions
 ### Django model fields
