@@ -134,6 +134,9 @@ Simply follow the next steps:
 ## Changelog
 Please see the [CHANGELOG](CHANGELOG.md) for more details.
 
+## Implementations in other languages
+* [Java](https://github.com/making/timeflake4j)
+
 ## License
 This project is licensed under the MIT license. Please read the [LICENSE](LICENSE) file for more details.
 
