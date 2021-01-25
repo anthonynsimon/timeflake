@@ -15,7 +15,7 @@ Timeflake is a 128-bit, roughly-ordered, URL-safe UUID. Inspired by Twitter's Sn
 - **Efficient.** 128 bits are used to encode a timestamp in milliseconds (48 bits) and a cryptographically generated random number (80 bits).
 - **Flexible.** Out of the box encodings in 128-bit unsigned int, hex, URL-safe base62 and raw bytes. Fully compatible with uuid.UUID.
 
-\* Please consider how the [Birthday Paradox](https://betterexplained.com/articles/understanding-the-birthday-paradox/) might affect your use case. Also read security note on this readme.
+\* Please consider how the [Birthday Paradox](https://betterexplained.com/articles/understanding-the-birthday-paradox/) might affect your use case. Also read the security note on this readme.
 
 ## Why?
 This could be useful to you, if you're looking for a UUID with the following properties:
@@ -26,8 +26,8 @@ This could be useful to you, if you're looking for a UUID with the following pro
 
 Some existing alternatives which I considered:
 - **UUIDv1** but the timestamp bytes are not sequential and gives away network information.
-- **UUIDv4** but they're mostly random, and can mess up the performance on clustered indices.
-- **ULID** but approach to incrementing the sequence during same millisecond makes it more predictable.
+- **UUIDv4** but they're mostly random, and can mess up the performance on clustered indexes.
+- **ULID** but the approach to incrementing the sequence during the same millisecond makes it more predictable.
 - **KSUID** but it's 160-bit, so unfortunately not compatible with standard 128-bit UUIDs.
 
 
@@ -107,12 +107,27 @@ Example usage:
 from timeflake.extensions.django import TimeflakePrimaryKeyBinary
 
 class Item(models.Model):
-    item_id = TimeflakePrimaryKeyBinary()
-    # ...
+   item_id = TimeflakePrimaryKeyBinary()
+   # ...
 ```
 
 ## Note on security
 Since the timestamp part is predictable, the search space within any given millisecond is 2^80 random numbers, which is meant to avoid collisions, not to secure or hide information. You should not be using timeflakes for password-reset tokens, API keys or for anything which is security sensitive. There are better libraries which are meant for this use case (for example, the standard library's [secrets module](https://docs.python.org/3/library/secrets.html)).
+
+## Note on privacy
+Please be aware of the privacy implications that time based IDs can have. As Timeflake encodes the precise time in which the ID was created, this could potentially reveal:
+- User timezone.
+- Geographic location: If the client software creates multiple associated IDs at the same time (like an article and embedded media), then the differences in timestamps of the IDs can reveal the latency of the client's network connection to the server. This reveals user geographic location. This can also happen if the client creates a single ID and the server adds an additional timestamp to the object.
+- User identity (de-anonymizing)
+   1. Most Android apps include Google's libraries for working with push notifications. And some iOS apps that use Google Cloud services also load the libraries. These Google libraries automatically load Google Analytics which records the names of every screen the users view in the app, and sends them to Google. So Google knows that userN switched from screen "New Post" to screen "Published Post" at time K.
+   2. Some ISPs record and sell user behavior data. For example, SAP knows that userN made a request to appM's API at time K.
+   3. Even if the posting app does not share its user behavior data with third-parties, the user could post and then immediately switch to an app that does share user behavior data. This provides data points like "userN stopped using an app that does not record analytics at time K".
+   4. Operating Systems (Android, Windows, macOS) send user behavior data to their respective companies.
+   5. Browsers and Browser Extensions send user behavior data to many companies. Data points like "userN visited a URL at example.com at time K" can end up in many databases and sold.
+   6. Posting times combined with traffic analysis can perfectly de-anonymize users.
+- How long the user took to write the post. This can happen if the app creates the ID when the user starts editing the post and also shares a timestamp of the publication or save time.
+- Whether or not the user edited the post after posting it. This can happen if the posts's displayed time doesn't match the timestamp in the ID.
+- Whether or not the user prepared the post in advance and set it to post automatically. If the timestamp is very close to a round numbered time like 21:00:00, it was likely posted automatically. If the posting platform does not provide such functionality, then the user must be using some third-party software or custom software to do it. This information can help de-anonymize the user.
 
 ## Supported versions
 Right now the codebase is only tested with Python 3.7+.
@@ -131,6 +146,11 @@ Simply follow the next steps:
 - Send a pull request, it will be reviewed shortly.
 - In case you want to add a feature, please create a new issue and briefly explain what the feature would consist of. For bugs or requests, before creating an issue please check if one has already been created for it.
 
+## Contributors
+Thank you for making this project better!
+
+- [@mleonhard](https://github.com/mleonhard) - documented privacy implications of time based IDs.
+
 ## Changelog
 Please see the [CHANGELOG](CHANGELOG.md) for more details.
 
@@ -145,3 +165,6 @@ This project is licensed under the MIT license. Please read the [LICENSE](LICENS
 - [Sharding & IDs at Instagram](https://instagram-engineering.com/sharding-ids-at-instagram-1cf5a71e5a5c)
 - [Announcing Snowflake: Twitter](https://blog.twitter.com/engineering/en_us/a/2010/announcing-snowflake.html)
 - [The 2^120 Ways to Ensure Unique Identifiers](https://firebase.googleblog.com/2015/02/the-2120-ways-to-ensure-unique_68.html)
+
+
+
