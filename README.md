@@ -151,7 +151,7 @@ Thank you for making this project better!
 
 - [@mleonhard](https://github.com/mleonhard) - documented privacy implications of time based IDs.
 - [@making](https://github.com/making) - Implemented Java version of Timeflake.
-
+- [@Gioni06](https://github.com/Gioni06) - Implemented Go version of Timeflake.
 ## Changelog
 Please see the [CHANGELOG](CHANGELOG.md) for more details.
 
