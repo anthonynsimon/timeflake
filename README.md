@@ -158,6 +158,7 @@ Please see the [CHANGELOG](CHANGELOG.md) for more details.
 ## Implementations in other languages
 * [Java](https://github.com/making/timeflake4j)
 * [Go](https://github.com/Gioni06/go-timeflake)
+* [Javascript/Typescript](https://github.com/zzzz465/timeflake4js)
 
 ## License
 This project is licensed under the MIT license. Please read the [LICENSE](LICENSE) file for more details.
