@@ -1,9 +1,9 @@
 # Changelog
 
-# next
+## next
 - Add peewee ORM extension
 
-# 0.3.3
+## 0.3.3
 - Minor bug fixes.
 
 ## 0.3.2
