@@ -111,6 +111,9 @@ class Item(models.Model):
    # ...
 ```
 
+### Peewee ORM
+See [this gist](https://gist.github.com/bibby/3c7a162fb83a833850af8ff668d5441b) for an example.
+
 ## Note on security
 Since the timestamp part is predictable, the search space within any given millisecond is 2^80 random numbers, which is meant to avoid collisions, not to secure or hide information. You should not be using timeflakes for password-reset tokens, API keys or for anything which is security sensitive. There are better libraries which are meant for this use case (for example, the standard library's [secrets module](https://docs.python.org/3/library/secrets.html)).
 
@@ -153,6 +156,7 @@ Thank you for making this project better!
 - [@making](https://github.com/making) - Implemented Java version of Timeflake.
 - [@Gioni06](https://github.com/Gioni06) - Implemented Go version of Timeflake.
 - [@zzzz465](https://github.com/zzzz465) - Implementation of TS/JS version of Timeflake.
+- [@bibby](https://github.com/bibby) - Added extension for peewee ORM.
 
 ## Changelog
 Please see the [CHANGELOG](CHANGELOG.md) for more details.
