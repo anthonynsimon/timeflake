@@ -1,7 +1,10 @@
 # Changelog
 
 ## next
+
+## 0.4.0
 - Add peewee ORM extension
+- Subclass Timeflake from stdlib UUID
 
 ## 0.3.3
 - Minor bug fixes.
