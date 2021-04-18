@@ -3,9 +3,11 @@ import uuid
 import timeflake
 from peewee import Field
 
+
 class TimeflakeBase62Field(Field):
 
-    field_type = 'CHAR'
+    field_type = "CHAR"
+
     def db_value(self, value):
         if value is None:
             return value
@@ -26,7 +28,8 @@ class TimeflakeBase62Field(Field):
 
 
 class TimeflakeUUIDField(Field):
-    field_type = 'UUID'
+    field_type = "UUID"
+
     def db_value(self, value):
         if value is None:
             return value
