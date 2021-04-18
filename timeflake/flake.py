@@ -11,32 +11,19 @@ MAX_RANDOM = 1208925819614629174706175
 MAX_TIMEFLAKE = 340282366920938463463374607431768211455
 
 
-class Timeflake:
+class Timeflake(uuid.UUID):
     def __init__(self, from_bytes: bytes):
         if from_bytes is None:
             raise ValueError("from_bytes is a required parameter")
-        self._bytes = from_bytes
+        super(self.__class__, self).__init__(bytes=from_bytes)
         # Validate flake
         as_int = self.int
         if as_int < 0 or MAX_TIMEFLAKE < as_int:
             raise ValueError("Invalid flake provided")
 
     @property
-    def bytes(self) -> bytes:
-        return self._bytes
-
-    @property
     def uuid(self) -> uuid.UUID:
         return uuid.UUID(bytes=self.bytes)
-
-    @property
-    def int(self) -> int:
-        return int.from_bytes(self.bytes, "big", signed=False)
-
-    @property
-    @lru_cache(1)
-    def hex(self) -> str:
-        return itoa(self.int, HEX, padding=32)
 
     @property
     @lru_cache(1)
