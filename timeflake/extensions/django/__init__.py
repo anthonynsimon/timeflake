@@ -15,6 +15,12 @@ class TimeflakeBinary(models.UUIDField):
         if value is not None:
             if isinstance(value, uuid.UUID):
                 return timeflake.Timeflake(from_bytes=value.bytes)
+            else:
+                raise exceptions.ValidationError(
+                    self.error_messages['invalid'],
+                    code='invalid',
+                    params={'value': value},
+                )
         return value
 
 
