@@ -1,8 +1,7 @@
-import time
 import uuid
 from functools import lru_cache
 
-from timeflake.utils import atoi, itoa
+from timeflake.utils import itoa
 
 BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 HEX = "0123456789abcdef"
