@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 
 from timeflake import __version__
 
-assert sys.version >= "3.7", "Requires Python v3.7 or above."
+assert sys.version_info >= (3, 7), "Requires Python v3.7 or above."
 
 HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
