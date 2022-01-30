@@ -158,6 +158,7 @@ Thank you for making this project better!
 - [@zzzz465](https://github.com/zzzz465) - Implementation of TS/JS version of Timeflake.
 - [@bibby](https://github.com/bibby) - Added extension for peewee ORM.
 - [@sebst](https://github.com/sebst) - Improved compatibility with standard UUID class. 
+- [@yedpodtrzitko](https://github.com/yedpodtrzitko) - Codebase improvements. 
 
 ## Changelog
 Please see the [CHANGELOG](CHANGELOG.md) for more details.
