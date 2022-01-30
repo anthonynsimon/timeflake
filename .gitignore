@@ -2,6 +2,7 @@
 
 # editors
 .vscode
+.idea
 
 # env
 .python-version
