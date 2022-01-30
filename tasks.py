@@ -2,8 +2,9 @@ import invoke
 
 
 @invoke.task
-def fmt(ctx):
-    ctx.run("black .")
+def fmt(ctx, check=True):
+    cmd = "black --check ." if check else "black ."
+    ctx.run(cmd)
 
 
 @invoke.task
