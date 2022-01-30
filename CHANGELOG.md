@@ -2,6 +2,9 @@
 
 ## next
 
+## 0.4.2
+- Support install on Python 3.10
+
 ## 0.4.1
 - Remove deprecated gettext helper from Django extension.
 
