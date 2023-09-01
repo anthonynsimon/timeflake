@@ -114,6 +114,15 @@ hex    = 016fb4209023b444fd07590f81b7b0eb
 base62 = 02i2XhN7hAuaFh3MwztcMd
 ```
 
+You can convert a timeflake to any alphabet using the `itoa` (integer to ASCII) function:
+
+```python
+from timeflake.utils import itoa
+
+flake = timeflake.random()
+itoa(flake.int, alphabet=timeflake.flake.HEX, padding=32)
+```
+
 ## Provided extensions
 ### Django model fields
 You can use timeflakes as primary keys for your models. These fields currently support MySQL, Postgres and Sqlite3.
