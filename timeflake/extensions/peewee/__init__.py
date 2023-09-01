@@ -5,7 +5,6 @@ from peewee import Field
 
 
 class TimeflakeBase62Field(Field):
-
     field_type = "CHAR"
 
     def db_value(self, value):

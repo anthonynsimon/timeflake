@@ -2,7 +2,7 @@ import invoke
 
 
 @invoke.task
-def fmt(ctx, check=True):
+def fmt(ctx, check=False):
     cmd = "black --check ." if check else "black ."
     ctx.run(cmd)
 
@@ -28,6 +28,6 @@ def build(ctx):
     ctx.run("python setup.py sdist bdist_wheel")
 
 
-@invoke.task(fmt, test, build)
+@invoke.task
 def publish(ctx):
     ctx.run("twine upload dist/*")
