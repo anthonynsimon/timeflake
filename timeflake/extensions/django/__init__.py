@@ -61,7 +61,7 @@ class TimeflakeBinary(models.Field):
             return _parse(value)
         except (AttributeError, ValueError):
             raise exceptions.ValidationError(
-                self.error_messages["invalid"], code="invalid", params={"value": value},
+                self.error_messages["invalid_choice"], code="invalid", params={"value": value},
             )
 
     def get_db_prep_value(self, value, connection, prepared=False):
