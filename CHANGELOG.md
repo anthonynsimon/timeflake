@@ -2,6 +2,10 @@
 
 ## next
 
+## 0.4.3
+- Django extension: Fix KeyError in TimeflakeBinary error handling [PR-18](https://github.com/anthonynsimon/timeflake/pull/18)
+- Add support for Python 3.11
+
 ## 0.4.2
 - Support install on Python 3.10
 

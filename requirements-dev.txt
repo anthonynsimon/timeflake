@@ -1,7 +1,7 @@
 black >= 19.10b0
-pytest == 5.3.2
-twine == 3.1.1
-wheel == 0.38.1
+pytest >= 5.3.2
+twine >= 3.1.1
+wheel >= 0.38.1
 invoke >= 1.4.0
 
 -e .
