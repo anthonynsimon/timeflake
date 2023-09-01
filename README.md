@@ -84,14 +84,11 @@ timeflake.from_values(1579091935216, 724773312193627487660233)
 For example, the timeflake `016fb4209023b444fd07590f81b7b0eb` (hex) encodes the following:
 
 ```
-# HEX represenation
-
 016fb4209023  +  b444fd07590f81b7b0eb
       |                   |
       |                   |
-  timestamp             random
-  [48 bits]            [80 bits]
-
+  timestamp            random
+  [48 bits]           [80 bits]
 ```
 
 In Python:
