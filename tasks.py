@@ -29,5 +29,10 @@ def build(ctx):
 
 
 @invoke.task
-def publish(ctx):
-    ctx.run("twine upload dist/*")
+def publish(ctx, token=None):
+    cmds = ["twine", "upload"]
+    if token:
+        cmds.extend(["--username", "__token__"])
+        cmds.extend(["--password", token])
+    cmds.append("dist/*")
+    ctx.run(" ".join(cmds))
