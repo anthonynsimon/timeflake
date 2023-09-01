@@ -74,15 +74,32 @@ timeflake.from_values(1579091935216, 724773312193627487660233)
 ```
 
 
-## Components
+## Spec
 
-The timeflake `02i2XhN7hAuaFh3MwztcMd` (base62) encodes the following:
+128 bits are used to encode:
+
+1) UNIX-time in milliseconds (48 bits)
+2) Cryptographically generated random number (80 bits)
+
+For example, the timeflake `016fb4209023b444fd07590f81b7b0eb` (hex) encodes the following:
+
 ```
-# Milliseconds since unix epoch
-timestamp = 1579275030563
+# HEX represenation
 
-# Cryptographically generated random number
-random    = 851298578153087956398315
+016fb4209023  +  b444fd07590f81b7b0eb
+      |                   |
+      |                   |
+  timestamp             random
+  [48 bits]            [80 bits]
+
+```
+
+In Python:
+
+```python
+flake = timeflake.parse(from_hex='016fb4209023b444fd07590f81b7b0eb')
+flake.timestamp = 1579275030563  # 2020-01-17T15:30:30.563 UTC
+flake.random = 851298578153087956398315
 ```
 
 ## Alphabets
